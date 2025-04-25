@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Save Life</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="/style/ambulance_UI.CSS">
+
+</head>
+<header>
+  <img src="images/Component 6.png" alt="Logo" class="logo">
+  <button class="logout-btn">Logout</button>
+
+</header>
+
+<body>
+  <div class="all-fields">
+    <div class="input-fields">
+      <div class="autocomplete-container">
+        <input id="source" placeholder="Enter Source Address" />
+        <div id="source-suggestions" class="autocomplete-suggestions"></div>
+      </div>
+      <div class="autocomplete-container">
+        <input id="destination" placeholder="Enter Destination Address" />
+        <div id="destination-suggestions" class="autocomplete-suggestions"></div>
+      </div>
+      <button onclick="selectRoute()" class="select-btn">Select Route</button>
+    </div>
+    <div id="map"></div>
+    <button id="share-location" class="share-location-btn">Share Live Location</button>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- <script src="https://unpkg.com/leaflet-routing-machine"></script> -->
+  <!-- <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+  </script>
+  <script type="text/javascript">
+    (function () {
+      emailjs.init({
+        publicKey: "lBETuVUVxxtJBLb5P",
+      });
+    })();
+  </script>
+  <script>
+    let userInfo = "";
+    let checkcred = () => {
+      // if (!localStorage.getItem('ambulance-user-cred'))
+      //   window.location.href = 'home.html';
+      // else
+      //   console.log(localStorage.getItem('ambulance-user-cred'));
+
+      const storedUserInfo = localStorage.getItem("ambulance-user-cred");
+      if (storedUserInfo != null) {
+        userInfo = JSON.parse(storedUserInfo);
+        console.log("Retrieved user info:", userInfo);
+      } else {
+        window.location.href = 'home.html';
+
+      }
+    }
+    window.addEventListener('load', checkcred);
+    let sourceLat;
+    let sourceLon
+    let destLat;
+    let destLon;
+    let Source = "";
+    let Destination = "";
+    let ambulanceNumber = "";
+    const socket = new WebSocket("ws://localhost:8080/tracking/location");
+    let routeWaypoints = [];
+
+
+
+
+
+    async function fetchMarkers() {
+      try {
+        const response = await fetch("http://localhost:8080/police/getAllMarkers", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json(); // Assuming JSON response
+        console.log("Fetched Data:", data);
+
+        // Extract relevant details and store in markers array
+        var markers = data.map(police => ({
+          lat: police.coordinates.latitude,
+          lng: police.coordinates.longitude,
+          name: police.userName,
+          email: police.email
+        }));
+
+        return markers;
+
+      } catch (error) {
+        console.error("Error fetching markers:", error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const map = L.map("map").setView([17.8495919, 79.1151663], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+      if (typeof sourceMarker !== "undefined" && sourceMarker) {
+        map.removeLayer(sourceMarker);
+      }
+      if (typeof destinationMarker !== "undefined" && destinationMarker) {
+        map.removeLayer(destinationMarker);
+      }
+
+
+      let carMarker = L.marker([17.871098, 78.757523], {
+        icon: L.icon({
+          iconUrl: "https://cdn3.iconfinder.com/data/icons/unigrid-flat-vehicles-vol-2/90/001_179_car_transport_emergency_ambulance_flashing-1024.png",
+          iconSize: [50, 50], // Adjust size as needed
+          iconAnchor: [25, 25], // Center the icon properly
+          popupAnchor: [0, -25] // Adjust popup position if needed
+        }),
+      }).addTo(map);
+
+
+      //   function updateLiveLocation() {
+      //     if (navigator.geolocation) {
+      //       navigator.geolocation.watchPosition(
+      //         (position) => {
+      //           const lat = position.coords.latitude;
+      //           const lon = position.coords.longitude;
+
+      //           console.log(`Live Location: ${lat}, ${lon}`);
+
+      //           carMarker.setLatLng([lat, lon]);
+      //           map.setView([lat, lon], 14);
+      //         },
+      //         (error) => console.error("Error getting location", error),
+      //         { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      //       );
+      //     } else {
+      //       alert("Geolocation is not supported by this browser.");
+      //     }
+      //   }
+
+      document.getElementById("share-location").addEventListener("click", updateLiveLocation);
+
+      async function fetchSuggestions(query) {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+            query
+          )}&format=json&addressdetails=1&countrycodes=in&bounded=1&viewbox=68,37,97,8`
+        );
+        if (!response.ok) throw new Error("Failed to fetch suggestions");
+        return await response.json();
+      }
+
+      // async function updateLiveLocation() {
+      //   //markers adding
+
+      //   // var markers = [
+      //   //   { lat: 17.865770, lng: 78.759210, name: "kodakandla", email: "policeKodakandla@gmail.com" },
+      //   //   { lat: 17.831733, lng: 78.705841, name: "pregnapur", email: "policePregnapur@gmail.com" }, // Example additional marker
+      //   //   { lat: 17.443349, lng: 78.487300, name: "paradise", email: "policeParadise@gmail.com" },
+      //   //   { lat: 17.443075, lng: 78.495654, name: "patny", email: "policePatny@gmail.com" }
+
+      //   // ];
+
+      //   const markers = await fetchMarkers();
+
+
+
+
+
+
+
+
+
+      //   const policeIcon = L.icon({
+      //     iconUrl: "https://img.icons8.com/?size=512w&id=81133&format=png", // Blue for police stations
+      //     iconSize: [32, 32],
+      //     iconAnchor: [16, 32],
+      //     popupAnchor: [0, -32]
+      //   });
+      //   markers.forEach(m => {
+      //     L.marker([m.lat, m.lng], { icon: policeIcon }, { draggable: false }).addTo(map).bindPopup(m.name);
+      //   });
+
+      //   var control = L.Routing.control({
+      //     waypoints: [
+      //       L.latLng(sourceLat, sourceLon),
+      //       L.latLng(destLat, destLon)
+      //     ],
+      //     routeWhileDragging: false,
+
+
+      //   }).addTo(map);
+
+      //   control.on('routesfound', function (e) {
+      //     var route = e.routes[0].coordinates;
+      //     const radius = 300; // if police is aroud in  300 meters radius b/w  the route
+      //     let markerResults = [];
+
+      //     markers.forEach(m => {
+      //       let mLatLng = L.latLng(m.lat, m.lng);
+      //       let isNearRoute = "no";
+
+      //       for (let i = 0; i < route.length; i += 10) {
+      //         let rLatLng = L.latLng(route[i].lat, route[i].lng);
+      //         if (rLatLng.distanceTo(mLatLng) < radius) {
+      //           isNearRoute = "yes";
+      //           if (isNearRoute) {
+      //             console.log(m.email, m.name);
+      //             //email function
+      //             // emailjs.send("service_j6cqqhw", "template_kwg1a5a", {
+      //             //   Ambulance_Details: "ambualance :TS 21 Z 12",
+      //             //   Ambulance_Route: `From : ${Source} To: ${Destination}`,
+      //             //   to_email: "praneethsunny374@gmail.com",
+      //             //   reply_to: "-",
+      //             // });
+      //             // console.log("email sent");
+      //           }
+      //           break;
+      //         }
+      //       }
+
+      //       markerResults.push({ name: m.name, lat: m.lat, lng: m.lng, status: isNearRoute, email: m.email });
+      //     });
+
+      //     markerResults.forEach(result => {
+      //       console.log(`Marker: ${result.name} (Lat: ${result.lat}, Lng: ${result.lng}) - Status: ${result.status},-email:${result.email} `);
+      //     });
+      //   });
+
+
+
+
+
+
+      //   if (navigator.geolocation) {
+      //     setInterval(() => {
+      //       navigator.geolocation.watchPosition(
+      //         (position) => {
+      //           const lat = position.coords.latitude;
+      //           const lon = position.coords.longitude;
+      //           carMarker.setLatLng([lat, lon]);
+      //           //           map.setView([lat, lon], 14);
+      //           console.log(`Live Location: ${lat}, ${lon}`); // Logs location every 3 sec
+
+      //            const route_way = {
+      //             start: [parseFloat(sourceLat), parseFloat(sourceLon)],
+      //             end: [parseFloat(destLat), parseFloat(destLon)]
+      //           };
+
+      //           // Send location as JSON
+      //           const locationData = {
+      //             latitude: lat,
+      //             longitude: lon,
+      //             // route: routeWaypoints // Send route if available
+      //             route: route_way,
+      //             source: Source,
+      //             destination: Destination
+      //           };
+
+      //           socket.send(JSON.stringify(locationData));
+
+
+      //         });
+
+      //       routingControl.on('routesfound', function (e) {
+      //         routeWaypoints = e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]);
+      //         console.log("Route waypoints sent:", routeWaypoints);
+      //         //your function 
+
+
+
+      //         // Move the car icon and adjust map view
+      //         carMarker.setLatLng([lat, lon]);
+      //         map.setView([lat, lon], 16); // Zoom level 16 for better visibility
+      //       },
+      //         (error) => console.error("Error getting location", error),
+      //         {
+      //           enableHighAccuracy: true,  // Use GPS for best accuracy
+      //           maximumAge: 0,             // Do not use cached location
+      //           timeout: 3000              // Wait max 5 sec for update
+      //         }
+      //       );
+      //     }, 3000); // Updates every 3 seconds
+
+      //   } else {
+      //     alert("Geolocation is not supported by this browser.");
+      //   }
+
+      // }
+
+
+      // Start tracking when button is clicked
+
+
+      async function updateLiveLocation() {
+        const markers = await fetchMarkers();
+
+        const policeIcon = L.icon({
+          iconUrl: "https://img.icons8.com/?size=512w&id=81133&format=png",
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        markers.forEach(m => {
+          L.marker([m.lat, m.lng], { icon: policeIcon, draggable: false })
+            .addTo(map)
+            .bindPopup(m.name);
+        });
+
+        var control = L.Routing.control({
+          waypoints: [
+            L.latLng(sourceLat, sourceLon),
+            L.latLng(destLat, destLon)
+          ],
+          routeWhileDragging: false,
+        }).addTo(map);
+
+        control.on('routesfound', function (e) {
+          var route = e.routes[0].coordinates;
+          const radius = 300;
+          let markerResults = [];
+
+          markers.forEach(m => {
+            let mLatLng = L.latLng(m.lat, m.lng);
+            let isNearRoute = "no";
+
+            for (let i = 0; i < route.length; i += 10) {
+              let rLatLng = L.latLng(route[i].lat, route[i].lng);
+              if (rLatLng.distanceTo(mLatLng) < radius) {
+                isNearRoute = "yes";
+                console.log(m.email, m.name);
+                // if (isNearRoute == "yes") {
+                //   // emailjs.send("service_j6cqqhw", "template_kwg1a5a", {
+                //   //   Ambulance_Route: `From : ${Source} To: ${Destination}`,
+                //   //   to_email: `${m.email}`,
+                //   //   Ambulance_Details: `Ambulance Number : ${userInfo.ambulanceNumber} 
+                //   //     Hospital Name:${userInfo.hospitalName},
+                //   //     Ambulance Driver Name: ${userInfo.driverDetails.name},
+                //   //     Ambulance Driver Phone Number : ${userInfo.driverDetails.phoneNumber}
+                //   //   `,
+
+                //   //   reply_to: "-",
+                // });
+
+                //   console.log("email sent");
+
+                // }
+
+                break;
+              }
+            }
+
+            markerResults.push({ name: m.name, lat: m.lat, lng: m.lng, status: isNearRoute, email: m.email });
+          });
+
+          markerResults.forEach(result => {
+            console.log(`Marker: ${result.name} (Lat: ${result.lat}, Lng: ${result.lng}) - Status: ${result.status}, Email: ${result.email}`);
+          });
+        });
+
+        if (navigator.geolocation) {
+          // setInterval(() => {
+          navigator.geolocation.watchPosition(
+            (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              carMarker.setLatLng([lat, lon]);
+
+              console.log(`Live Location: ${lat}, ${lon}`);
+
+              const route_way = {
+                start: [parseFloat(sourceLat), parseFloat(sourceLon)],
+                end: [parseFloat(destLat), parseFloat(destLon)]
+              };
+
+              const locationData = {
+                latitude: lat,
+                longitude: lon,
+                route: route_way,
+                source: Source,
+                destination: Destination,
+                ambulanceNumber: userInfo.ambulanceNumber
+              };
+
+              socket.send(JSON.stringify(locationData));
+
+              map.setView([lat, lon], 16);
+            },
+            (error) => console.error("Error getting location", error),
+            {
+              enableHighAccuracy: true,
+              //changed maximumAGE from -0 to 1000
+              maximumAge: 0,
+              timeout: 10000
+            }
+          );
+          // }, 3000);
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+
+
+        //gemini
+
+        // if (navigator.geolocation) {
+        //   let lat, lon; // Declare lat and lon in a higher scope
+        //   let routeWaypoints = null; // Store route waypoints
+        //   let routeSent = false; // Track if the route has been sent
+
+        //   navigator.geolocation.watchPosition(
+        //     (position) => {
+        //       lat = position.coords.latitude;
+        //       lon = position.coords.longitude;
+        //       carMarker.setLatLng([lat, lon]);
+        //       console.log(`Live Location: ${lat}, ${lon}`);
+
+        //       const locationData = {
+        //         latitude: lat,
+        //         longitude: lon,
+        //         source: Source,
+        //         destination: Destination,
+        //       };
+
+        //       if (routeWaypoints && !routeSent) {
+        //         locationData.route = routeWaypoints;
+        //         routeSent = true;
+        //         console.log(routeSent + "sent route")
+        //       }
+
+        //       try {
+        //         socket.send(JSON.stringify(locationData));
+        //       } catch (error) {
+        //         console.error("Error sending location data:", error);
+        //       }
+
+        //     },
+        //     (error) => {
+        //       console.error("Error getting location", error);
+        //       alert("Unable to get location. Please ensure location services are enabled.");
+        //     },
+        //     {
+        //       enableHighAccuracy: true,
+        //       maximumAge: 0,
+        //       timeout: 10000,
+        //     }
+        //   );
+
+        //   routingControl.on('routesfound', function (e) {
+        //     routeWaypoints = e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]);
+        //     console.log("Route waypoints found:", routeWaypoints);
+        //     if (lat && lon) {
+        //       carMarker.setLatLng([lat, lon]);
+        //       map.setView([lat, lon], 16);
+        //     }
+        //   });
+
+        // } else {
+        //   alert("Geolocation is not supported by this browser.");
+        // }
+      }
+
+      // Prevent browser from throttling execution
+      // function keepActive() {
+      //   setTimeout(keepActive, 5000);
+      // }
+      // keepActive();
+
+
+
+      document.getElementById("share-location").addEventListener("click", updateLiveLocation);
+
+      function showSuggestions(inputField, suggestionsContainer, suggestions) {
+        suggestionsContainer.innerHTML = "";
+        suggestions.forEach((s) => {
+          const suggestionDiv = document.createElement("div");
+          suggestionDiv.className = "autocomplete-suggestion";
+          suggestionDiv.textContent = s.display_name;
+
+          suggestionDiv.addEventListener("click", () => {
+            inputField.value = s.display_name;
+            inputField.dataset.lat = s.lat;
+            inputField.dataset.lon = s.lon;
+            suggestionsContainer.innerHTML = "";
+          });
+
+          suggestionsContainer.appendChild(suggestionDiv);
+        });
+      }
+
+      async function handleInput(inputField, suggestionsContainer) {
+        const query = inputField.value.trim();
+        if (query.length >= 2) {
+          try {
+            const results = await fetchSuggestions(query);
+            showSuggestions(inputField, suggestionsContainer, results);
+          } catch (error) {
+            console.error("Error fetching autocomplete:", error);
+          }
+        } else {
+          suggestionsContainer.innerHTML = "";
+        }
+      }
+
+      const sourceInput = document.getElementById("source");
+
+      const sourceSuggestions = document.getElementById("source-suggestions");
+
+      const destinationInput = document.getElementById("destination");
+      const destinationSuggestions = document.getElementById("destination-suggestions");
+
+      sourceInput.addEventListener("input", () =>
+        handleInput(sourceInput, sourceSuggestions)
+      );
+      destinationInput.addEventListener("input", () =>
+        handleInput(destinationInput, destinationSuggestions)
+      );
+
+      window.selectRoute = function () {
+        sourceLat = sourceInput.dataset.lat;
+        sourceLon = sourceInput.dataset.lon;
+        destLat = destinationInput.dataset.lat;
+        destLon = destinationInput.dataset.lon;
+        Source = document.getElementById("source").value;
+        Destination = document.getElementById("destination").value;
+        console.log(Source + Destination);
+        if (!sourceLat || !sourceLon || !destLat || !destLon) {
+          alert("Please select valid addresses from the suggestions.");
+          return;
+        }
+        if (typeof L.Routing === "undefined") {
+          console.error("L.Routing is not defined. Check if leaflet-routing-machine.js is loaded.");
+          return;
+        }
+
+        // Remove previous route if exists
+        if (typeof routingControl !== "undefined") {
+          map.removeControl(routingControl);
+        }
+        routingControl = L.Routing.control({
+
+          waypoints: [
+            L.latLng(parseFloat(sourceLat), parseFloat(sourceLon)),
+            L.latLng(parseFloat(destLat), parseFloat(destLon)),
+          ],
+        }).addTo(map);
+        routingControl.on('routesfound', function (e) {
+          routeWaypoints = e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]);
+          console.log("Route waypoints sent:", routeWaypoints);
+        });
+      };
+    });
+
+    document.querySelector('.logout-btn').addEventListener('click', () => {
+      console.log("from logout");
+      localStorage.removeItem("ambulance-user-cred");
+      window.location.href = "home.html";
+
+    })
+  </script>
+</body>
+
+</html>
+<!-- 
+//     // Live location sharing functionality
+//     let tracking = false;
+//         let trackingInterval;
+//         let destination = L.latLng(18.1016, 78.8520);
+//         const emailRecipient = "praneethsunny374@gmail.com";
+
+//         document.getElementById("share-location").addEventListener("click", function() {
+//             if (!tracking) {
+//                 tracking = true;
+//                 startTracking();
+//             }
+//         });
+
+//         function startTracking() {
+//             trackingInterval = setInterval(() => {
+//                 if (navigator.geolocation) {
+//                     navigator.geolocation.getCurrentPosition(position => {
+//                         let userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
+//                         console.log(`Live Location: ${userLatLng.lat}, ${userLatLng.lng}`);
+//                         sendEmail(userLatLng);
+
+//                         if (userLatLng.distanceTo(destination) < 500) {
+//                             clearInterval(trackingInterval);
+//                             tracking = false;
+//                             console.log("Ambulance reached within 500m of the destination. Stopping tracking.");
+//                         }
+//                     });
+//                 }
+//             }, 3000); // Update every 3 seconds
+//         }
+
+//         function sendEmail(location) {
+//             let emailBody = `Live Location: ${location.lat}, ${location.lng}`;
+//             console.log(`Sending email to ${emailRecipient}: ${emailBody}`);
+//             // Here, implement backend integration to send emails
+//         }
+//   </script>
+// </body>
+// </html> -->

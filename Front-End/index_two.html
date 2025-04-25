@@ -1,0 +1,67 @@
+<!-- seond try -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Routing with Markers Check</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+</head>
+<body>
+    <div id="map" style="height: 500px;"></div>
+    <script>
+        var map = L.map('map').setView([17.3850, 78.4867], 10); 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var markers = [
+        { lat:17.865770, lng:78.759210, name: "kodakandla" },
+        { lat:17.831733, lng:78.705841, name: "pregnapur" }, // Example additional marker
+        { lat:17.443349, lng:78.487300, name: "paradise" },
+        { lat:17.443075, lng:78.495654, name: "pregnapur" }
+       
+    ];  
+        
+        markers.forEach(m => {
+            L.marker([m.lat, m.lng], { draggable: false }).addTo(map).bindPopup(m.name);
+        });
+
+        var control = L.Routing.control({
+    waypoints: [
+        L.latLng(17.3850, 78.4867), // Hyderabad
+        L.latLng(18.1016, 78.8520)  // Siddipet
+    ],
+    routeWhileDragging: true,
+    // Disables default waypoint markers
+}).addTo(map);
+
+        control.on('routesfound', function(e) {
+            var route = e.routes[0].coordinates;
+            const radius = 300; // 300 meters
+            let markerResults = [];
+            
+            markers.forEach(m => {
+                let mLatLng = L.latLng(m.lat, m.lng);
+                let isNearRoute = "no";
+                
+                for (let i = 0; i < route.length; i += 10) { // Checking every 10th point for efficiency
+                    let rLatLng = L.latLng(route[i].lat, route[i].lng);
+                    if (rLatLng.distanceTo(mLatLng) < radius) {
+                        isNearRoute = "yes";
+                        break;
+                    }
+                }
+                
+                markerResults.push({ name: m.name, lat: m.lat, lng: m.lng, status: isNearRoute });
+            });
+            
+            markerResults.forEach(result => {
+                console.log(`Marker: ${result.name} (Lat: ${result.lat}, Lng: ${result.lng}) - Status: ${result.status}`);
+            });
+        });
+    </script>
+</body>
+</html>

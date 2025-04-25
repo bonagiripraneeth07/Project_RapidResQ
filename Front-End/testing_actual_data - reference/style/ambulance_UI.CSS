@@ -1,0 +1,129 @@
+header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    background-color: #4e6fffeb;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.997) 0px 8px 16px -8px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.buttons{
+    display: flex;
+    gap: 10px;
+}
+.logout-btn {
+    background-color: #ea2f0ede;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.logout-btn:hover{
+    background-color: #8e0404;
+}
+.logo {
+    width: 170px;
+
+    height: auto;
+}
+* {
+   
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ 
+
+
+
+#map {
+    height: 500px;
+    margin-top: 10px;
+  }
+
+  .autocomplete-suggestions {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+
+  .autocomplete-suggestion {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .autocomplete-suggestion:hover {
+    background-color: #f0f0f0;
+  }
+
+  input {
+    margin: 5px;
+    padding: 8px;
+    width: 90%;
+  }
+
+  .autocomplete-container {
+    position: relative;
+  }
+  #source{
+    width: 250px;
+    border-style: solid;
+    border-radius: 5px;
+
+  }
+  #destination{
+    width: 250px;
+    border-style: solid;
+    border-radius: 5px; 
+  }
+  .all-fields{
+    display:grid;
+  }
+  .input-fields{
+    position: relative;
+     left: 40%;
+     top: 10%;
+  }
+  .select-btn{
+    margin: 30px;
+    position: relative;
+    left: 40px;
+    border-style: none;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    background-color: #ea1818;
+    cursor: pointer;
+  }
+  .select-btn:hover{
+    background-color: #c51111fa;
+  }
+  #map{
+    position: relative;
+    left: 15%;
+    width: 1000px;
+    height: 600px;
+    border-radius: 10px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  }
+  .share-location-btn{
+        width: 200px;
+        position: relative;
+        left: 41%;
+        margin: 20px 0px 30px 0px;
+        border-style: none;
+        padding: 10px;
+        border-radius: 5px;
+        color: white;
+        background-color: #ea1818;
+        cursor: pointer;
+  }
+  .share-location-btn:hover{
+    background-color: #c51111fa;
+  }

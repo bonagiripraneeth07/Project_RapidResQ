@@ -1,0 +1,243 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    background-color: #4e6fffeb;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.997) 0px 8px 16px -8px;
+}
+
+.logo {
+    width: 170px;
+    cursor: pointer;
+    height: auto;
+}
+
+.title {
+    margin-left: 15px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.collage-img {
+    margin-top: 100px;
+    width: 100%;
+    height: auto;
+    border-style: none;
+    border-radius: 5px;
+
+}
+
+.about {
+    margin: 10px;
+    border-radius: 10px;
+    /* / background-color: rgba(224, 67, 67, 0.834); */
+    background-color: #4e6fffeb;
+    color: white;
+    font-size: 20px;
+    padding: 40px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+body {
+    background-color: #f7f7f792;
+}
+
+.register-btn {
+
+    position: relative;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -4%);
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #ea1818;
+    border-style: solid;
+    border-color: red;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
+
+.register-btn:hover {
+    background-color: #ea1818;
+    color: #fff;
+}
+
+.register-police-btn {
+    display: block;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-bottom: 30px;
+}
+
+.register-ambulance-btn {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: 30px;
+    transform: translate(-50%, -50%);
+
+}
+
+.login-ambulance-btn {
+    display: block;
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    margin-top: 30px;
+    transform: translate(-50%, -50%);
+}
+
+/* HTML: <div class="loader"></div> */
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 40px;
+    aspect-ratio: 4;
+    --_g: no-repeat radial-gradient(circle closest-side, #4e6fffeb 90%, #ffffff0e);
+    padding: 10px;
+    background:
+        var(--_g) 0% 50%,
+        var(--_g) 50% 50%,
+        var(--_g) 100% 50%;
+    background-size: calc(100%/3) 100%;
+    animation: l7 1s infinite linear;
+}
+
+@keyframes l7 {
+    33% {
+        background-size: calc(100%/3) 0%, calc(100%/3) 100%, calc(100%/3) 100%
+    }
+
+    50% {
+        background-size: calc(100%/3) 100%, calc(100%/3) 0%, calc(100%/3) 100%
+    }
+
+    66% {
+        background-size: calc(100%/3) 100%, calc(100%/3) 100%, calc(100%/3) 0%
+    }
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+     transform: translate(-50%, -50%);
+    background: rgb(249, 249, 249);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    height: 460px;
+    width: 500px;
+    ;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 5;
+}
+
+.close-btn {
+    font-size: 18px;
+    position: fixed;
+    top: 9%;
+    padding: 4px;
+    color: rgb(255, 6, 6);
+    right: 10%;
+    border-style: solid;
+    border-color: #5e5e5e;
+    background-color: transparent;
+
+}
+
+.police-registation-form {
+    margin-top: 40px;
+    padding: 5px;
+    position: fixed;
+
+
+}
+
+.place-holders-registration {
+    padding: 5px;
+}
+
+.p-registration {
+    padding: 5px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.popup-headers {
+    margin: 10px;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    left: 50%;
+    padding: 5px;
+    font-size: 20px;
+    background-color: #f30808c7;
+    color: white;
+    width: auto;
+}
+
+.ambulance-login-form {
+    padding: 20px;
+    margin: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.video-av{
+    width: 100%;
+     height: 700px;
+    border-radius: 10x;
+    margin: 10px;
+    background-color: #644acd7d;
+   /* box-shadow: 0 0 10px rgba(248, 43, 43, 0.752); */ 
+   box-shadow: rgba(104, 32, 229, 0.774) 0px 54px 55px, rgba(108, 38, 199, 0.686) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+.controls {
+    margin-top: 10px;
+    /* box-shadow: rgba(255, 255, 255, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(255, 255, 255, 0.766) 0px 4px 6px, rgba(226, 224, 224, 0.825) 0px 12px 13px, rgba(251, 251, 251, 0.688) 0px -3px 5px;    border-radius: 20px;
+    background-color: #9da4e4; */
+  
+}
+
+#playPauseBtn {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 16px;
+    margin: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -20%);
+
+}
+
+#playPauseBtn:hover {
+    background: #555;
+}

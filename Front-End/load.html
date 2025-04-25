@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="loginForm">
+        <label for="userName">Username:</label>
+        <input type="text" id="userName" name="userName" required>
+        <br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+        
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            const userName = document.getElementById("userName").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch("http://localhost:8080/police/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userName, password })
+            });
+
+            const result = await response.text();
+            console.log(result);
+            alert(result);
+            if (result=="Successful") {
+
+                sessionStorage.setItem("user-creds", JSON.stringify(userName));
+                console.log(result);
+                alert("Login successful!");
+                window.location.href = "tracking.html"; // Redirect after login
+            } else {
+                alert("Login failed! Please check your credentials.");
+            }
+        });
+    </script>
+</body>
+</html>

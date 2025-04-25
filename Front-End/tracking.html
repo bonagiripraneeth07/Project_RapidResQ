@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Ambulance</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- <script src="https://unpkg.com/leaflet-routing-machine"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+  <style>
+    #map {
+      height: 500px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Live Ambulance Tracking</h2>
+  <div id="map"></div>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:8080/location");
+    const map = L.map("map").setView([17.8495919, 79.1151663], 15);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    const ambulanceIcon = L.icon({
+      iconUrl: "https://cdn3.iconfinder.com/data/icons/unigrid-flat-vehicles-vol-2/90/001_179_car_transport_emergency_ambulance_flashing-1024.png",
+      iconSize: [50, 50],
+      iconAnchor: [25, 25]
+    });
+
+    let ambulanceMarker = L.marker([17.8495919, 79.1151663], { icon: ambulanceIcon }).addTo(map)
+      .bindPopup("Ambulance AP 123 X 12")
+      .openPopup();
+    let routePolyline = null;
+
+    socket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      const lat = data.latitude;
+      const lon = data.longitude;
+      const route = data.route || [];
+      const route_source = data.source;
+      const route_destination = data.destination
+      console.log("Received location:", lat, lon);
+      console.log("recevied route ", route)
+      console.log(route_source);
+
+      ambulanceMarker.setLatLng([lat, lon]);
+
+      map.setView([lat, lon], 15);
+
+      const startLatLng = L.latLng(data.route.start[0], data.route.start[1]);
+      const endLatLng = L.latLng(data.route.end[0], data.route.end[1]);
+
+      if (typeof sourceMarker !== "undefined" && sourceMarker) {
+        map.removeLayer(sourceMarker);
+      }
+      if (typeof destinationMarker !== "undefined" && destinationMarker) {
+        map.removeLayer(destinationMarker);
+      }
+      const sourceIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+      });
+
+      const destinationIcon = L.icon({
+        iconUrl: "https://img.icons8.com/?size=100&id=7880&format=png&color=40C057",
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+      });
+      sourceMarker = L.marker(startLatLng, { icon: sourceIcon }).addTo(map)
+        .bindPopup("Ambulance Start Location");
+
+      destinationMarker = L.marker(endLatLng, { icon: destinationIcon }).addTo(map)
+        .bindPopup("Destination Hospital");
+
+
+
+      routeControl = L.Routing.control({
+        waypoints: [startLatLng, endLatLng],
+        routeWhileDragging: false,
+        createMarker: function () { return null; },
+      }).addTo(map);
+    }
+
+
+    socket.onerror = function (error) {
+      console.error("WebSocket Error:", error);
+    };
+
+
+
+  </script>
+</body>
+
+</html>

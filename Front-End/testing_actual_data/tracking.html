@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Ambulance</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- <script src="https://unpkg.com/leaflet-routing-machine"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <link rel="stylesheet" href="/style/tracking.css">
+  <link rel="stylesheet" href="/style/home.css">
+</head>
+<header>
+  <img src="images/Component 6.png" alt="Logo" class="logo">
+
+</header>
+
+<body>
+  <h2>Live Ambulance Tracking</h2>
+  <div id="map"></div>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:8080/tracking/location");
+    const map = L.map("map").setView([17.8495919, 79.1151663], 15);
+    let ambulanceNumber = "";
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    const ambulanceIcon = L.icon({
+      iconUrl: "https://cdn3.iconfinder.com/data/icons/unigrid-flat-vehicles-vol-2/90/001_179_car_transport_emergency_ambulance_flashing-1024.png",
+      iconSize: [50, 50],
+      iconAnchor: [25, 25]
+    });
+
+
+
+    // socket.onmessage = function (event) {
+    //   const data = JSON.parse(event.data);
+    //   const lat = data.latitude;
+    //   const lon = data.longitude;
+    //   const route = data.route || [];
+    //   const route_source = data.source;
+    //   const route_destination = data.destination;
+    //   ambulanceNumber = data.ambulanceNumber;
+    //   console.log("Received location:", lat, lon);
+    //   console.log("recevied route ", route)
+    //   console.log(route_source);
+    //   console.log(socket);
+    //   let ambulanceMarker = L.marker([17.8495919, 79.1151663], { icon: ambulanceIcon }).addTo(map)
+    //     .bindPopup(`Ambulance : ${ambulanceNumber}`)
+    //     .openPopup();
+    //   let routePolyline = null;
+    //   // Update ambulance marker
+    //   ambulanceMarker.setLatLng([lat, lon]);
+
+    //   //map.setView([lat, lon], 0);
+    //   map.flyTo([lat, lon], map.getZoom());
+    //   // map.panTo([lat, lon]);
+    //   // map.setMinZoom(12);  // Prevent too much zoom out
+    //   // map.setMaxZoom(10);// Prevent extreme zoom-in
+    //   // Extract start and end coordinates
+    //   const startLatLng = L.latLng(data.route.start[0], data.route.start[1]);
+    //   const endLatLng = L.latLng(data.route.end[0], data.route.end[1]);
+
+    //   // Remove old markers if they exist
+    //   if (typeof sourceMarker !== "undefined" && sourceMarker) {
+    //     map.removeLayer(sourceMarker);
+    //   }
+    //   if (typeof destinationMarker !== "undefined" && destinationMarker) {
+    //     map.removeLayer(destinationMarker);
+    //   }
+    //   // Custom icons
+    //   const sourceIcon = L.icon({
+    //     iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+    //     iconSize: [40, 40],
+    //     iconAnchor: [20, 40],
+    //   });
+
+    //   const destinationIcon = L.icon({
+    //     iconUrl: "https://img.icons8.com/?size=100&id=7880&format=png&color=40C057",
+    //     iconSize: [40, 40],
+    //     iconAnchor: [20, 40],
+    //   });
+    //   sourceMarker = L.marker(startLatLng, { icon: sourceIcon }).addTo(map)
+    //     .bindPopup("Ambulance Start Location");
+
+    //   destinationMarker = L.marker(endLatLng, { icon: destinationIcon }).addTo(map)
+    //     .bindPopup("Destination Hospital");
+
+
+    //   // Remove existing route if present
+    //   // if (routeControl) map.removeControl(routeControl);
+
+    //   // Use Leaflet Routing Machine to construct the actual route
+    //   routeControl = L.Routing.control({
+    //     waypoints: [startLatLng, endLatLng],
+    //     routeWhileDragging: false,
+    //     createMarker: function () { return null; }, // Hide default markers
+    //   }).addTo(map);
+    // }
+    // Update route if received
+    // if (route && route.length > 0) {
+    //   const startLatLng = L.latLng(route[0][0], route[0][1]);  // Adjust indexing if needed
+    //   const endLatLng = L.latLng(route[route.length - 1][0], route[route.length - 1][1]);
+    // } else {
+    //   console.error("Route data is missing or empty:", route);
+    // }
+
+    //upate on 24-03
+    // socket.onmessage = function (event) {
+    //   let data;
+    //   try {
+    //     data = JSON.parse(event.data);
+    //   } catch (error) {
+    //     console.error("Error parsing JSON:", error);
+    //     return;
+    //   }
+
+    //   if (!data.route || !data.route.start || !data.route.end) {
+    //     console.error("Invalid route data received:", data);
+    //     return;
+    //   }
+
+    //   let startCoords = data.route.start;
+    //   let endCoords = data.route.end;
+
+    //   console.log("Route received:", startCoords, "to", endCoords);
+
+    //   // Example: Update route on map
+    //   routingControl.setWaypoints([
+    //     L.latLng(startCoords[0], startCoords[1]),
+    //     L.latLng(endCoords[0], endCoords[1])
+    //   ]);
+    // };
+
+
+    socket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      const lat = data.latitude;
+      const lon = data.longitude;
+      const route = data.route || {}; // Provide a default empty object
+      const route_source = data.source;
+      const route_destination = data.destination;
+      ambulanceNumber = data.ambulanceNumber;
+      console.log("Received location:", lat, lon);
+      console.log("received route ", route);
+      console.log(route_source);
+      console.log(socket);
+      let ambulanceMarker = L.marker([17.8495919, 79.1151663], { icon: ambulanceIcon }).addTo(map)
+        .bindPopup(`Ambulance : ${ambulanceNumber}`)
+        .openPopup();
+      let routePolyline = null;
+      // Update ambulance marker
+      ambulanceMarker.setLatLng([lat, lon]);
+      if (!window.mapInitialized) {
+        map.setView([lat, lon], 16); // Set zoom once
+        window.mapInitialized = true;
+      } else {
+        map.panTo([lat, lon]); // No zoom, just move smoothly
+      }
+      //map.setView([lat, lon], 0);
+      // map.panTo([lat, lon]);
+      // map.panTo([lat, lon]);
+      // map.setMinZoom(12);  // Prevent too much zoom out
+      // map.setMaxZoom(10);// Prevent extreme zoom-in
+      // Extract start and end coordinates
+      if (route && route.start && route.end) { // Check if route and its properties exist
+        const startLatLng = L.latLng(route.start[0], route.start[1]);
+        const endLatLng = L.latLng(route.end[0], route.end[1]);
+
+        // Remove old markers if they exist
+        if (typeof sourceMarker !== "undefined" && sourceMarker) {
+          map.removeLayer(sourceMarker);
+        }
+        if (typeof destinationMarker !== "undefined" && destinationMarker) {
+          map.removeLayer(destinationMarker);
+        }
+        // Custom icons
+        const sourceIcon = L.icon({
+          iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+          iconSize: [40, 40],
+          iconAnchor: [20, 40],
+        });
+
+        const destinationIcon = L.icon({
+          iconUrl: "https://img.icons8.com/?size=100&id=7880&format=png&color=40C057",
+          iconSize: [40, 40],
+          iconAnchor: [20, 40],
+        });
+        sourceMarker = L.marker(startLatLng, { icon: sourceIcon }).addTo(map)
+          .bindPopup("Ambulance Start Location");
+
+        destinationMarker = L.marker(endLatLng, { icon: destinationIcon }).addTo(map)
+          .bindPopup("Destination Hospital");
+
+        // Remove existing route if present
+        // if (routeControl) map.removeControl(routeControl);
+
+        // Use Leaflet Routing Machine to construct the actual route
+        routeControl = L.Routing.control({
+          waypoints: [startLatLng, endLatLng],
+          routeWhileDragging: false,
+          createMarker: function () { return null; }, // Hide default markers
+        }).addTo(map);
+      } else {
+        console.log("Route data is missing or incomplete.");
+        // Handle the case where route data is missing.
+      }
+    };
+
+
+
+
+    socket.onerror = function (error) {
+      console.error("WebSocket Error:", error);
+    };
+
+    let checkcred = () => {
+      if (!sessionStorage.getItem('user-creds'))
+        window.location.href = 'load.html';
+      else
+        console.log(sessionStorage.getItem('user-creds'))
+
+    }
+    window.addEventListener('load', checkcred);
+
+
+    function preventBack() { window.history.forward(); }
+    setTimeout("preventBack()", 0);
+    window.onunload = function () { null };
+  </script>
+</body>
+
+</html>

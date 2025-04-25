@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidResQ|Get Started</title>
+    <link rel="stylesheet" href="/style/home.css">
+    <style>
+
+    </style>
+</head>
+<header>
+    <img src="images/Component 6.png" alt="Logo" class="logo">
+
+</header>
+
+<body>
+    <img class="collage-img" src="images/photo-collage.png.png" alt="">
+    <div class="about">
+        <b>RapidResQ</b> is a crucial innovation in emergency response, significantly improving the efficiency of
+        medical
+        assistance. By enabling real-time coordination between ambulances and traffic police, the application ensures
+        that
+        life-saving medical help reaches patients faster. Traffic congestion often delays emergency services, but with
+        RapidResQ, authorities are instantly notified and can take immediate action to clear the way. This reduces
+        response
+        time, increases survival rates, and enhances overall traffic management. Additionally, the app minimizes human
+        intervention by automating alerts, ensuring that emergency responders focus on their primary task—saving lives.
+        By
+        streamlining communication and navigation, RapidResQ plays a vital role in making cities safer and more prepared
+        for
+        medical emergencies.
+        <div class="controls">
+            <video class="video-av" id="video" src="/videos/RpidResQ av - Made with Clipchamp.mp4" loop="true"></video>
+            <button id="playPauseBtn">Play</button>
+
+        </div>
+        <button class="register-btn register-click" onclick="openPopup('popup1')">Register/Login</button>
+
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+
+    <div class="popup" id="popup1">
+        <button class="register-police-btn register-btn " onclick="openPopup('popup2')"
+            id="register-police-btn">Register Police</button>
+        <button class="register-ambulance-btn register-btn" onclick="openPopup('popup3')"
+            id="register-ambulance-btn">Register Ambulance</button>
+        <button class="register-btn login-ambulance-btn " onclick="openPopup('popup4')">Login</button>
+        <button onclick="closePopup()" class="close-btn"> X</button>
+    </div>
+
+    <!-- Ambulance-Registration  Popup -->
+    <div class="popup" id="popup3">
+        <p class="popup-headers">Ambulance Registration</p>
+        <div class="police-registation-form">
+            <p class="p-registration">User Name</p>
+            <input type="text" placeholder="Enter User Name" class="place-holders-registration" id="user-name-input">
+            <p class="p-registration">User Password</p>
+            <input type="password" placeholder="Enter Password" id="password-input" class="place-holders-registration">
+            <input type="checkbox" onclick="showPassoword('password-input')">Show Password
+            <p class="p-registration">Ambulance Number</p>
+            <input type="text" placeholder="Enter Your Vehcile number" id="ambulance-number-input"
+                class="place-holders-registration">
+            <p>Hospital Name</p>
+            <input type="text" placeholder="Enter Hospital Name" class="place-holders-registration"
+                id="hospital-name-input">
+            <div>
+                <p class="p-registration">Your Details</p>
+                <input type="text" placeholder="Enter Name " id="name-input" class="place-holders-registration">
+                <input type="number" placeholder="Enter Phone-Number" id="user-number-input"
+                    class="place-holders-registration">
+            </div>
+            <button class="register-btn " id="ambulance-registration-btn">Register</button>
+        </div>
+        <button onclick="closePopup()" class="close-btn"> X</button>
+    </div>
+
+    <!-- Police-Registration Popup -->
+    <div class="popup" id="popup2">
+        <p class="popup-headers">Police Registration</p>
+        <div class="police-registation-form">
+            <p class="p-police-registration ">User Name</p>
+            <input type="text" placeholder="Enter User Name" id="user-name-input-police"
+                class="place-holders-registration">
+            <p class="p-police-registration">User Password</p>
+            <input type="password" placeholder="Enter Password" id="password-input-police"
+                class="place-holders-registration">
+            <input type="checkbox" onclick="showPassoword('password-input-police')">Show Password
+            <p class="p-police-registration">Email</p>
+            <input type="text" placeholder="Enter Your Email" id="email-police-input"
+                class="place-holders-registration">
+            <div>
+                <p class="p-police-registration">Coordinates</p>
+                <input type="number" placeholder="Enter Latitude " id="latitude-input"
+                    class="place-holders-registration">
+                <input type="number" placeholder="Enter longitude" id="longitude-input"
+                    class="place-holders-registration">
+            </div>
+            <button class="register-btn" id="Police-register-btn" name="police-registration">Register</button>
+
+        </div>
+        <button onclick="closePopup()" class="close-btn"> X</button>
+    </div>
+    <!--Ambulance Login -->
+    <div id="popup4" class="popup">
+        <p class="popup-headers">Login</p>
+        <div class="ambulance-login-form">
+            <p class="p-police-registration ">User Name</p>
+            <input type="text" placeholder="Enter User Name" id="user-name-input-login"
+                class="place-holders-registration">
+            <p class="p-police-registration">User Password</p>
+            <input type="password" placeholder="Enter Password" id="password-input-login"
+                class="place-holders-registration">
+            <br>
+            <input type="checkbox" onclick="showPassoword('password-input-login')">Show Password
+            <br>
+            <button class="register-btn" id="ambulance-login-btn">Login</button>
+
+        </div>
+        <button onclick="closePopup()" class="close-btn"> X</button>
+    </div>
+    <script>
+        function openPopup(id) {
+            closePopup(); // Close any open popups first
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        function closePopup() {
+            document.querySelectorAll('.popup').forEach(popup => popup.style.display = 'none');
+            document.getElementById('overlay').style.display = 'none';
+        }
+        function showPassoword(id) {
+            var x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+        const video = document.getElementById("video");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        playPauseBtn.addEventListener("click", () => {
+            if (video.paused) {
+                video.play();
+                playPauseBtn.textContent = "Pause";
+            } else {
+                video.pause();
+                playPauseBtn.textContent = "Play";
+            }
+        });
+
+        document.getElementById('Police-register-btn').addEventListener('click', async () => {
+
+            const username = document.getElementById("user-name-input-police").value;
+            const password = document.getElementById("password-input-police").value;
+            const email = document.getElementById("email-police-input").value;
+            const latitude = document.getElementById("latitude-input").value;
+            const longitude = document.getElementById("longitude-input").value;
+            console.log(username, password, email, latitude, longitude);
+            var x = document.getElementById('password-input');
+            // if (x.type === "password") {
+            //     x.type = "text";
+            // } else {
+            //     x.type = "password";
+            // }
+            if (username == "" || password == "" || email == "" || latitude == "" || longitude == "") {
+                alert("Provide Proper Details");
+            } else {
+                document.getElementById('Police-register-btn').innerHTML = `<div class="loader"></div>`;
+                const policeData = {
+                    userName: username,
+                    password: password,
+                    email: email,
+                    coordinates: {
+                        latitude: latitude,
+                        longitude: longitude
+                    }
+                }
+                const result = await registerPolice(policeData);
+                if (result === "Success") {
+                    alert("Registration successful!");
+                    document.getElementById('Police-register-btn').innerHTML = `Register`;
+                    closePopup();
+                } else {
+                    document.getElementById('Police-register-btn').innerHTML = `Register`;
+                    alert("Registration failed!");
+                }
+            }
+        })
+        async function registerPolice(policeData) {
+            try {
+                const response = await fetch("http://localhost:8080/police/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(policeData)
+                })
+                const result = await response.text();
+                return result;
+            } catch (error) {
+                console.error("Error registering police:", error);
+                return null;
+            }
+        }
+
+        document.getElementById('ambulance-registration-btn').addEventListener('click', async () => {
+
+            const username = document.getElementById("user-name-input").value;
+            const name = document.getElementById("name-input").value;
+            const password = document.getElementById("password-input").value;
+            const ambulance_number = document.getElementById("ambulance-number-input").value;
+            const hospital_name = document.getElementById("hospital-name-input").value;
+            const phone_number = document.getElementById("user-number-input").value;
+            if (username == "" || password == "" || name == "" || ambulance_number == "" || hospital_name == "" || phone_number == "") {
+                alert("Please Provide Details");
+            } else {
+                const ambulanceDetails = {
+                    userName: username,
+                    password: password,
+                    ambulanceNumber: ambulance_number,
+                    hospitalName: hospital_name,
+                    driverDetails: {
+                        name: name,
+                        phoneNumber: phone_number
+                    }
+                }
+                document.getElementById('ambulance-registration-btn').innerHTML = `<div class="loader"></div>`;
+                const result = await ambulanceRegister(ambulanceDetails);
+                if (result == "Registration Successful") {
+                    alert("Registration Successful");
+                    document.getElementById('ambulance-registration-btn').innerText = `Register`;
+                    closePopup();
+                } else {
+
+                    alert("Registration Failed!");
+                    document.getElementById('ambulance-registration-btn').innerText = `Register`;
+                }
+            }
+
+        })
+        async function ambulanceRegister(ambulanceDetails) {
+            try {
+                const response = await fetch("http://localhost:8080/ambulance/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(ambulanceDetails)
+                })
+                const result = await response.text();
+                return result;
+            } catch (error) {
+                console.error("Error registering Ambulance:", error);
+                return null;
+            }
+
+        }
+
+        document.getElementById('ambulance-login-btn').addEventListener('click', async () => {
+            const username = document.getElementById('user-name-input-login').value;
+            const password = document.getElementById('password-input-login').value;
+            if (username == "" || password == "") {
+                alert("Please Provide Details");
+            } else {
+                const ambulanceDetails = {
+                    userName: username,
+                    password: password
+                }
+                document.getElementById('ambulance-login-btn').innerHTML = `<div class="loader"></div>`;
+                console.log(ambulanceDetails);
+                const result = await ambulanceLogin(ambulanceDetails);
+                console.log(result);
+                if (result.status == 302) {
+                    console.log(result);
+                    alert("LoginSuccessful");
+                    const userInfo = JSON.parse(result.userInfo);
+                    // const userCreds = {
+                    //     username: result.userInfo.userName,
+                    //     name: result.userInfo.name,
+                    //     phoneNumber: result.userInfo.phoneNumber,
+                    //     hospitalName: result.userInfo.hospitalName,
+                    //     ambulanceNumber: result.userInfo.ambulanceNumber
+                    // }
+                    console.log(userInfo);
+                    localStorage.setItem("ambulance-user-cred", JSON.stringify(userInfo));
+                    window.location.href = "ambulance_UI.html";
+                    closePopup();
+                    console.log(localStorage.getItem("ambulance-user-cred"));
+                    document.getElementById('ambulance-login-btn').innerHTML = `Login`;
+                } else {
+                    alert("Login  Failed!");
+                    document.getElementById('ambulance-login-btn').innerHTML = `Login`;
+
+                }
+            }
+        })
+        async function ambulanceLogin(ambulanceDetails) {
+            try {
+                const response = await fetch("http://localhost:8080/ambulance/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(ambulanceDetails)
+                })
+                const result = {
+                    userInfo: await response.text(),
+                    status: await response.status
+                }
+
+
+
+                return result;
+            } catch (error) {
+                console.error("  Login  Error :", error);
+                return null;
+            }
+
+        }
+
+
+    </script>
+</body>
+
+</html>
