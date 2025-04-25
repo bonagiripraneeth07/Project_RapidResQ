@@ -81,7 +81,7 @@ Once the ambulance reaches the destination, the tracking session automatically e
 
 ![photo-collage png](https://github.com/user-attachments/assets/8edcbcf4-93de-4d1a-a18c-e1aacc19cb68)
 
-<b font-size="30px" align="center">Markers i.e police getting email and Details of the ambulance</b>
+<b font-size="30px" align="center">Email notification for Markers i.e Traffic Police</b>
 
 ![email](https://github.com/user-attachments/assets/5aa10b28-35d6-4386-933c-105297fde6b4)
 
