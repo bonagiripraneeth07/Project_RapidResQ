@@ -11,9 +11,7 @@ RapidResQ is a smart real-time ambulance tracking and communication system that 
 It enables ambulances to share their live location with the nearest traffic police, allowing them to proactively clear traffic along the ambulance’s route. 
 This reduces delays and ensures faster emergency response, potentially saving countless lives.
 
-As a computer science student, I was determined to solve this problem. <br/>🚀 From that day forward, I kept learning, experimenting, and refining my ideas. This journey of consistent effort, passion, and perseverance led me to build RapidResQ.
-
-💻 But the journey doesn’t stop here! I’m still actively working on this project, making it more efficient and scalable to ensure it can create a real impact. Every life matters, and I believe technology can play a key role in saving them.
+ I’m still actively working on this project, making it more efficient and scalable to ensure it can create a real impact. Every life matters, and I believe technology can play a key role in saving them.
 
 
 
