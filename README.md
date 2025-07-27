@@ -2,7 +2,7 @@
 <b>RapdidResQ </b>
 
 <b> Watch Small AV on RapidResQ</b>
-  [![Small AV on RapidResQ](https://images.indianexpress.com/2024/01/unnamed-file.png)](https://drive.google.com/file/d/1DjpbyVBYX4_dj5CVFKSo8VdNtoTLfnev/view?usp=drivesdk)
+  [![Small AV on RapidResQ](https://github.com/user-attachments/assets/e53fef2a-11e8-4521-ab42-b7be39b8bd1e)](https://drive.google.com/file/d/1DjpbyVBYX4_dj5CVFKSo8VdNtoTLfnev/view?usp=drivesdk)
 
  
 <b>What is RapidResQ?</b>
